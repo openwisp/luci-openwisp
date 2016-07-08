@@ -2,26 +2,26 @@
 -- Copyright 2008 Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-module("luci.controller.mini.index", package.seeall)
+module("luci.controller.openwisp.index", package.seeall)
 
 function index()
 	local root = node()
 	if not root.lock then
-		root.target = alias("mini")
+		root.target = alias("openwisp")
 		root.index = true
 	end
-	
+
 	entry({"about"}, template("about"))
-	
-	local page   = entry({"mini"}, alias("mini", "index"), _("Essentials"), 10)
+
+	local page   = entry({"openwisp"}, alias("openwisp", "index"), _("Essentials"), 10)
 	page.sysauth = "root"
 	page.sysauth_authenticator = "htmlauth"
 	page.index = true
-	
-	entry({"mini", "index"}, alias("mini", "index", "index"), _("Overview"), 10).index = true
-	entry({"mini", "index", "index"}, form("mini/index"), _("General"), 1).ignoreindex = true
-	entry({"mini", "index", "luci"}, cbi("mini/luci", {autoapply=true}), _("Settings"), 10)
-	entry({"mini", "index", "logout"}, call("action_logout"), _("Logout"))
+
+	entry({"openwisp", "index"}, alias("openwisp", "index", "index"), _("Overview"), 10).index = true
+	entry({"openwisp", "index", "index"}, form("openwisp/index"), _("General"), 1).ignoreindex = true
+	entry({"openwisp", "index", "luci"}, cbi("openwisp/luci", {autoapply=true}), _("Settings"), 10)
+	entry({"openwisp", "index", "logout"}, call("action_logout"), _("Logout"))
 end
 
 function action_logout()

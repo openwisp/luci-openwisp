@@ -2,23 +2,23 @@
 -- Copyright 2008 Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-module("luci.controller.mini.system", package.seeall)
+module("luci.controller.openwisp.system", package.seeall)
 
 function index()
-	entry({"mini", "system"}, alias("mini", "system", "index"), _("System"), 40).index = true
-	entry({"mini", "system", "index"}, cbi("mini/system", {autoapply=true}), _("General"), 1)
-	entry({"mini", "system", "passwd"}, form("mini/passwd"), _("Admin Password"), 10)
-	entry({"mini", "system", "backup"}, call("action_backup"), _("Backup / Restore"), 80)
-	entry({"mini", "system", "upgrade"}, call("action_upgrade"), _("Flash Firmware"), 90)
-	entry({"mini", "system", "reboot"}, call("action_reboot"), _("Reboot"), 100)
+	entry({"openwisp", "system"}, alias("openwisp", "system", "index"), _("System"), 40).index = true
+	entry({"openwisp", "system", "index"}, cbi("openwisp/system", {autoapply=true}), _("General"), 1)
+	entry({"openwisp", "system", "passwd"}, form("openwisp/passwd"), _("Admin Password"), 10)
+	entry({"openwisp", "system", "backup"}, call("action_backup"), _("Backup / Restore"), 80)
+	entry({"openwisp", "system", "upgrade"}, call("action_upgrade"), _("Flash Firmware"), 90)
+	entry({"openwisp", "system", "reboot"}, call("action_reboot"), _("Reboot"), 100)
 end
 
 function action_backup()
 	local reset_avail = os.execute([[grep '"rootfs_data"' /proc/mtd >/dev/null 2>&1]]) == 0
 	local restore_cmd = "gunzip | tar -xC/ >/dev/null 2>&1"
 	local backup_cmd  = "tar -c %s | gzip 2>/dev/null"
-	
-	local restore_fpi 
+
+	local restore_fpi
 	luci.http.setfilehandler(
 		function(meta, chunk, eof)
 			if not restore_fpi then
@@ -32,13 +32,13 @@ function action_backup()
 			end
 		end
 	)
-		  
+
 	local upload = luci.http.formvalue("archive")
 	local backup = luci.http.formvalue("backup")
 	local reset  = reset_avail and luci.http.formvalue("reset")
-	
+
 	if upload and #upload > 0 then
-		luci.template.render("mini/applyreboot")
+		luci.template.render("openwisp/applyreboot")
 		luci.sys.reboot()
 	elseif backup then
 		local reader = ltn12_popen(backup_cmd:format(_keep_pattern()))
@@ -47,16 +47,16 @@ function action_backup()
 		luci.http.prepare_content("application/x-targz")
 		luci.ltn12.pump.all(reader, luci.http.write)
 	elseif reset then
-		luci.template.render("mini/applyreboot")
+		luci.template.render("openwisp/applyreboot")
 		luci.util.exec("mtd -r erase rootfs_data")
 	else
-		luci.template.render("mini/backup", {reset_avail = reset_avail})
+		luci.template.render("openwisp/backup", {reset_avail = reset_avail})
 	end
 end
 
 function action_reboot()
 	local reboot = luci.http.formvalue("reboot")
-	luci.template.render("mini/reboot", {reboot=reboot})
+	luci.template.render("openwisp/reboot", {reboot=reboot})
 	if reboot then
 		luci.sys.reboot()
 	end
@@ -66,7 +66,7 @@ function action_upgrade()
 	require("luci.model.uci")
 
 	local tmpfile = "/tmp/firmware.img"
-	
+
 	local function image_supported()
 		-- XXX: yay...
 		return ( 0 == os.execute(
@@ -76,11 +76,11 @@ function action_upgrade()
 				% tmpfile
 		) )
 	end
-	
+
 	local function image_checksum()
 		return (luci.sys.exec("md5sum %q" % tmpfile):match("^([^%s]+)"))
 	end
-	
+
 	local function storage_size()
 		local size = 0
 		if nixio.fs.access("/proc/mtd") then
@@ -128,9 +128,9 @@ function action_upgrade()
 	local has_support  = image_supported()
 	local has_platform = nixio.fs.access("/lib/upgrade/platform.sh")
 	local has_upload   = luci.http.formvalue("image")
-	
+
 	-- This does the actual flashing which is invoked inside an iframe
-	-- so don't produce meaningful errors here because the the 
+	-- so don't produce meaningful errors here because the the
 	-- previous pages should arrange the stuff as required.
 	if step == 4 then
 		if has_platform and has_image and has_support then
@@ -163,8 +163,8 @@ function action_upgrade()
 		if has_image then
 			nixio.fs.unlink(tmpfile)
 		end
-			
-		luci.template.render("mini/upgrade", {
+
+		luci.template.render("openwisp/upgrade", {
 			step=1,
 			bad_image=(has_image and not has_support or false),
 			keepavail=keep_avail,
@@ -173,21 +173,21 @@ function action_upgrade()
 
 	-- Step 2: present uploaded file, show checksum, confirmation
 	elseif step == 2 then
-		luci.template.render("mini/upgrade", {
+		luci.template.render("openwisp/upgrade", {
 			step=2,
 			checksum=image_checksum(),
 			filesize=nixio.fs.stat(tmpfile).size,
 			flashsize=storage_size(),
 			keepconfig=(keep_avail and luci.http.formvalue("keepcfg") == "1")
 		} )
-	
+
 	-- Step 3: load iframe which calls the actual flash procedure
 	elseif step == 3 then
-		luci.template.render("mini/upgrade", {
+		luci.template.render("openwisp/upgrade", {
 			step=3,
 			keepconfig=(keep_avail and luci.http.formvalue("keepcfg") == "1")
 		} )
-	end	
+	end
 end
 
 function _keep_pattern()
