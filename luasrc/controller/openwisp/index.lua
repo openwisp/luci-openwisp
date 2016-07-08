@@ -20,7 +20,7 @@ function index()
 
 	entry({"openwisp", "index"}, alias("openwisp", "index", "index"), _("Overview"), 10).index = true
 	entry({"openwisp", "index", "index"}, form("openwisp/index"), _("General"), 1).ignoreindex = true
-	entry({"openwisp", "index", "luci"}, cbi("openwisp/luci", {autoapply=true}), _("Settings"), 10)
+	-- entry({"openwisp", "index", "luci"}, cbi("openwisp/luci", {autoapply=true}), _("Settings"), 10)
 	entry({"openwisp", "index", "logout"}, call("action_logout"), _("Logout"))
 end
 

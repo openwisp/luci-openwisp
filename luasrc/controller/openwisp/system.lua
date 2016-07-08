@@ -7,8 +7,8 @@ module("luci.controller.openwisp.system", package.seeall)
 function index()
 	entry({"openwisp", "system"}, alias("openwisp", "system", "index"), _("System"), 40).index = true
 	entry({"openwisp", "system", "index"}, cbi("openwisp/system", {autoapply=true}), _("General"), 1)
-	entry({"openwisp", "system", "passwd"}, form("openwisp/passwd"), _("Admin Password"), 10)
-	entry({"openwisp", "system", "backup"}, call("action_backup"), _("Backup / Restore"), 80)
+--	entry({"openwisp", "system", "passwd"}, form("openwisp/passwd"), _("Admin Password"), 10)
+--	entry({"openwisp", "system", "backup"}, call("action_backup"), _("Backup / Restore"), 80)
 	entry({"openwisp", "system", "upgrade"}, call("action_upgrade"), _("Flash Firmware"), 90)
 	entry({"openwisp", "system", "reboot"}, call("action_reboot"), _("Reboot"), 100)
 end
