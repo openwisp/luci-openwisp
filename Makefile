@@ -6,10 +6,9 @@
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=LuCI Essentials - stripped down and user-friendly
-LUCI_DEPENDS:=+luci-base @BROKEN
+LUCI_TITLE:=LuCI OpenWISP module
+LUCI_DEPENDS:=+luci-base
 
 include ../../luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
-

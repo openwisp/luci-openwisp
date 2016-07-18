@@ -1,0 +1,3 @@
+config openwisp 'gui'
+	option username 'operator'
+	option password 'password'
