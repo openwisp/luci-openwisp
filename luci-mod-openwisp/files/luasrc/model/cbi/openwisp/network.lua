@@ -80,115 +80,29 @@ function errors.cfgvalue(self, section)
 	return string.format("%s / %s", tx, rx)
 end
 
-
-
 s = m:section(NamedSection, "lan", "interface", translate("Local Network"))
 s.addremove = false
-s:option(Value, "ipaddr", translate("<abbr title=\"Internet Protocol Version 4\">IPv4</abbr>-Address"))
 
-nm = s:option(Value, "netmask", translate("<abbr title=\"Internet Protocol Version 4\">IPv4</abbr>-Netmask"))
-nm:value("255.255.255.0")
-nm:value("255.255.0.0")
-nm:value("255.0.0.0")
-
-gw = s:option(Value, "gateway", translate("<abbr title=\"Internet Protocol Version 4\">IPv4</abbr>-Gateway") .. translate(" (optional)"))
-gw.rmempty = true
-dns = s:option(Value, "dns", translate("<abbr title=\"Domain Name System\">DNS</abbr>-Server") .. translate(" (optional)"))
-dns.rmempty = true
-
---[[
-s = m:section(NamedSection, "wan", "interface", translate("Internet Connection"))
-s.addremove = false
 p = s:option(ListValue, "proto", translate("Protocol"))
 p.override_values = true
-p:value("none", "disabled")
-p:value("static", translate("manual"))
-p:value("dhcp", translate("automatic"))
-if has_pppoe then p:value("pppoe", "PPPoE") end
-if has_pptp  then p:value("pptp",  "PPTP")  end
-
-function p.write(self, section, value)
-	-- Always set defaultroute to PPP and use remote dns
-	-- Overwrite a bad variable behaviour in OpenWrt
-	if value == "pptp" or value == "pppoe" then
-		self.map:set(section, "peerdns", "1")
-		self.map:set(section, "defaultroute", "1")
-	end
-	return ListValue.write(self, section, value)
-end
-
-if not ( has_pppoe and has_pptp ) then
-	p.description = translate("You need to install \"ppp-mod-pppoe\" for PPPoE or \"pptp\" for PPtP support")
-end
-
+p:value("static", translate("Static IP"))
+p:value("dhcp", translate("DHCP client"))
 
 ip = s:option(Value, "ipaddr", translate("<abbr title=\"Internet Protocol Version 4\">IPv4</abbr>-Address"))
 ip:depends("proto", "static")
 
 nm = s:option(Value, "netmask", translate("<abbr title=\"Internet Protocol Version 4\">IPv4</abbr>-Netmask"))
 nm:depends("proto", "static")
+nm:value("255.255.255.0")
+nm:value("255.255.0.0")
+nm:value("255.0.0.0")
 
-gw = s:option(Value, "gateway", translate("<abbr title=\"Internet Protocol Version 4\">IPv4</abbr>-Gateway"))
+gw = s:option(Value, "gateway", translate("<abbr title=\"Internet Protocol Version 4\">IPv4</abbr>-Gateway") .. translate(" (optional)"))
 gw:depends("proto", "static")
 gw.rmempty = true
 
-dns = s:option(Value, "dns", translate("<abbr title=\"Domain Name System\">DNS</abbr>-Server"))
+dns = s:option(Value, "dns", translate("<abbr title=\"Domain Name System\">DNS</abbr>-Server") .. translate(" (optional)"))
 dns:depends("proto", "static")
 dns.rmempty = true
-
-usr = s:option(Value, "username", translate("Username"))
-usr:depends("proto", "pppoe")
-usr:depends("proto", "pptp")
-
-pwd = s:option(Value, "password", translate("Password"))
-pwd.password = true
-pwd:depends("proto", "pppoe")
-pwd:depends("proto", "pptp")
-
-
--- Allow user to set MSS correction here if the UCI firewall is installed
--- This cures some cancer for providers with pre-war routers
-if fs.access("/etc/config/firewall") then
-	mssfix = s:option(Flag, "_mssfix",
-		translate("Clamp Segment Size"), translate("Fixes problems with unreachable websites, submitting forms or other unexpected behaviour for some ISPs."))
-	mssfix.rmempty = false
-
-	function mssfix.cfgvalue(self)
-		local value
-		m.uci:foreach("firewall", "forwarding", function(s)
-			if s.src == "lan" and s.dest == "wan" then
-				value = s.mtu_fix
-			end
-		end)
-		return value
-	end
-
-	function mssfix.write(self, section, value)
-		m.uci:foreach("firewall", "forwarding", function(s)
-			if s.src == "lan" and s.dest == "wan" then
-				m.uci:set("firewall", s[".name"], "mtu_fix", value)
-				m:chain("firewall")
-			end
-		end)
-	end
-end
-
-kea = s:option(Flag, "keepalive", translate("automatically reconnect"))
-kea:depends("proto", "pppoe")
-kea:depends("proto", "pptp")
-kea.rmempty = true
-kea.enabled = "10"
-
-
-cod = s:option(Value, "demand", translate("disconnect when idle for"), "s")
-cod:depends("proto", "pppoe")
-cod:depends("proto", "pptp")
-cod.rmempty = true
-
-srv = s:option(Value, "server", translate("<abbr title=\"Point-to-Point Tunneling Protocol\">PPTP</abbr>-Server"))
-srv:depends("proto", "pptp")
-srv.rmempty = true
-
---]]
 
 return m
