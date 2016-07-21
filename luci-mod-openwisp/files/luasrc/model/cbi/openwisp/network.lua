@@ -96,7 +96,7 @@ gw.rmempty = true
 dns = s:option(Value, "dns", translate("<abbr title=\"Domain Name System\">DNS</abbr>-Server") .. translate(" (optional)"))
 dns.rmempty = true
 
-
+--[[
 s = m:section(NamedSection, "wan", "interface", translate("Internet Connection"))
 s.addremove = false
 p = s:option(ListValue, "proto", translate("Protocol"))
@@ -189,6 +189,6 @@ srv = s:option(Value, "server", translate("<abbr title=\"Point-to-Point Tunnelin
 srv:depends("proto", "pptp")
 srv.rmempty = true
 
-
+--]]
 
 return m
