@@ -26,7 +26,7 @@ function index()
 		require("luci.template")
 		context.path = {}
 		http.status(403, "Forbidden")
-		luci.template.render("sysauth", {duser=default, fuser=user})
+		luci.template.render("sysauth", {duser='operator', fuser=user})
 
 		return false
 	end
