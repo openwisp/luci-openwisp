@@ -17,184 +17,123 @@ function action_reboot()
 	luci.sys.reboot()
 end
 
+local function supports_sysupgrade()
+	return nixio.fs.access("/lib/upgrade/platform.sh")
+end
+
 function action_upgrade()
-	require("luci.model.uci")
+	--
+	-- Overview
+	--
+	luci.template.render("openwisp/upgrade/select", {
+		upgrade_avail = supports_sysupgrade()
+	})
+end
 
-	local tmpfile = "/tmp/firmware.img"
+function action_sysupgrade()
+	local fs = require "nixio.fs"
+	local http = require "luci.http"
+	local image_tmp = "/tmp/firmware.img"
 
-	local function image_supported()
-		-- XXX: yay...
-		return (0 == os.execute(
-			". /lib/functions.sh; " ..
-			"include /lib/upgrade; " ..
-			"platform_check_image %q >/dev/null" % tmpfile
-		))
-	end
-
-	local function image_checksum()
-		return (luci.sys.exec("md5sum %q" % tmpfile):match("^([^%s]+)"))
-	end
-
-	local function storage_size()
-		local size = 0
-		if nixio.fs.access("/proc/mtd") then
-			for l in io.lines("/proc/mtd") do
-				local d, s, e, n = l:match('^([^%s]+)%s+([^%s]+)%s+([^%s]+)%s+"([^%s]+)"')
-				if n == "linux" then
-					size = tonumber(s, 16)
-					break
-				end
-			end
-		elseif nixio.fs.access("/proc/partitions") then
-			for l in io.lines("/proc/partitions") do
-				local x, y, b, n = l:match('^%s*(%d+)%s+(%d+)%s+([^%s]+)%s+([^%s]+)')
-				if b and n and not n:match('[0-9]') then
-					size = tonumber(b) * 1024
-					break
-				end
-			end
-		end
-		return size
-	end
-
-	-- Install upload handler
-	local file
-	luci.http.setfilehandler(
+	local fp
+	http.setfilehandler(
 		function(meta, chunk, eof)
-			if not nixio.fs.access(tmpfile) and not file and chunk and #chunk > 0 then
-				file = io.open(tmpfile, "w")
+			if not fp and meta and meta.name == "image" then
+				fp = io.open(image_tmp, "w")
 			end
-			if file and chunk then
-				file:write(chunk)
+			if fp and chunk then
+				fp:write(chunk)
 			end
-			if file and eof then
-				file:close()
+			if fp and eof then
+				fp:close()
 			end
 		end
 	)
 
-	-- Determine state
-	local keep_avail   = true
-	local step		 = tonumber(luci.http.formvalue("step") or 1)
-	local has_image	= nixio.fs.access(tmpfile)
-	local has_support  = image_supported()
-	local has_platform = nixio.fs.access("/lib/upgrade/platform.sh")
-	local has_upload   = luci.http.formvalue("image")
+	if not luci.dispatcher.test_post_security() then
+		fs.unlink(image_tmp)
+		return
+	end
 
-	-- This does the actual flashing which is invoked inside an iframe
-	-- so don't produce meaningful errors here because the the
-	-- previous pages should arrange the stuff as required.
-	if step == 4 then
-		if has_platform and has_image and has_support then
-			-- Mimetype text/plain
-			luci.http.prepare_content("text/plain")
-			luci.http.write("Starting luci-flash...\n")
+	--
+	-- Cancel firmware flash
+	--
+	if http.formvalue("cancel") then
+		fs.unlink(image_tmp)
+		http.redirect(luci.dispatcher.build_url('openwisp/upgrade'))
+		return
+	end
 
-			-- Now invoke sysupgrade
-			local keepcfg = keep_avail and luci.http.formvalue("keepcfg") == "1"
-			local flash = ltn12_popen("/sbin/luci-flash %s %q" %{
-				keepcfg and "-k %q" % _keep_pattern() or "", tmpfile
+	--
+	-- Initiate firmware flash
+	--
+	local step = tonumber(http.formvalue("step") or 1)
+	if step == 1 then
+		if image_supported(image_tmp) then
+			luci.template.render("openwisp/upgrade/confirm", {
+				checksum = image_checksum(image_tmp),
+				sha256ch = image_sha256_checksum(image_tmp),
+				storage  = storage_size(),
+				size     = (fs.stat(image_tmp, "size") or 0),
+				keep     = (not not http.formvalue("keep"))
 			})
-
-			luci.ltn12.pump.all(flash, luci.http.write)
-
-			-- Make sure the device is rebooted
-			luci.sys.reboot()
+		else
+			fs.unlink(image_tmp)
+			luci.template.render("openwisp/upgrade/select", {
+				upgrade_avail = supports_sysupgrade(),
+				image_invalid = true
+			})
 		end
 	--
-	-- This is step 1-3, which does the user interaction and
-	-- image upload.
+	-- Start sysupgrade flash
 	--
-
-	-- Step 1: file upload, error on unsupported image format
-	elseif not has_image or not has_support or step == 1 then
-		-- If there is an image but user has requested step 1
-		-- or type is not supported, then remove it.
-		if has_image then
-			nixio.fs.unlink(tmpfile)
-		end
-
-		luci.template.render("openwisp/upgrade", {
-			step=1,
-			bad_image=(has_image and not has_support or false),
-			keepavail=keep_avail,
-			supported=has_platform
-		} )
-
-	-- Step 2: present uploaded file, show checksum, confirmation
 	elseif step == 2 then
-		luci.template.render("openwisp/upgrade", {
-			step=2,
-			checksum=image_checksum(),
-			filesize=nixio.fs.stat(tmpfile).size,
-			flashsize=storage_size(),
-			keepconfig=(keep_avail and luci.http.formvalue("keepcfg") == "1")
-		} )
-
-	-- Step 3: load iframe which calls the actual flash procedure
-	elseif step == 3 then
-		luci.template.render("openwisp/upgrade", {
-			step=3,
-			keepconfig=(keep_avail and luci.http.formvalue("keepcfg") == "1")
-		} )
+		local keep = (http.formvalue("keep") == "1") and "" or "-n"
+		luci.template.render("openwisp/reboot", {
+			title = luci.i18n.translate("Flashing..."),
+			msg   = luci.i18n.translate("The system is flashing now.<br /> DO NOT POWER OFF THE DEVICE!<br /> Wait a few minutes before you try to reconnect. It might be necessary to renew the address of your computer to reach the device again, depending on your settings."),
+			addr  = (#keep > 0) and "192.168.1.1" or nil
+		})
+		fork_exec("sleep 1; killall dropbear uhttpd; sleep 1; /sbin/sysupgrade %s %q" %{ keep, image_tmp })
 	end
 end
 
-function _keep_pattern()
-	local kpattern = ""
-	local files = luci.model.uci.cursor():get_all("luci", "flash_keep")
-	if files then
-		kpattern = ""
-		for k, v in pairs(files) do
-			if k:sub(1,1) ~= "." and nixio.fs.glob(v)() then
-				kpattern = kpattern .. " " ..  v
-			end
-		end
-	end
-	return kpattern
-end
-
-function ltn12_popen(command)
-	local fdi, fdo = nixio.pipe()
+function fork_exec(command)
 	local pid = nixio.fork()
-
 	if pid > 0 then
-		fdo:close()
-		local close
-		return function()
-			local buffer = fdi:read(2048)
-			local wpid, stat = nixio.waitpid(pid, "nohang")
-			if not close and wpid and stat == "exited" then
-				close = true
-			end
+		return
+	elseif pid == 0 then
+		-- change to root dir
+		nixio.chdir("/")
 
-			if buffer and #buffer > 0 then
-				return buffer
-			elseif close then
-				fdi:close()
-				return nil
+		-- patch stdin, out, err to /dev/null
+		local null = nixio.open("/dev/null", "w+")
+		if null then
+			nixio.dup(null, nixio.stderr)
+			nixio.dup(null, nixio.stdout)
+			nixio.dup(null, nixio.stdin)
+			if null:fileno() > 2 then
+				null:close()
 			end
 		end
-	elseif pid == 0 then
-		nixio.dup(fdo, nixio.stdout)
-		fdi:close()
-		fdo:close()
+
+		-- replace with target command
 		nixio.exec("/bin/sh", "-c", command)
 	end
 end
 
 function action_logout()
-		local dsp = require "luci.dispatcher"
-		local utl = require "luci.util"
-		local sid = dsp.context.authsession
+	local dsp = require "luci.dispatcher"
+	local utl = require "luci.util"
+	local sid = dsp.context.authsession
 
-		if sid then
-			utl.ubus("session", "destroy", { ubus_rpc_session = sid })
+	if sid then
+		utl.ubus("session", "destroy", { ubus_rpc_session = sid })
 
-			luci.http.header("Set-Cookie", "sysauth=%s; expires=%s; path=%s/" %{
-					sid, 'Thu, 01 Jan 1970 01:00:00 GMT', dsp.build_url()
-			})
-		end
+		luci.http.header("Set-Cookie", "sysauth=%s; expires=%s; path=%s/" %{
+				sid, 'Thu, 01 Jan 1970 01:00:00 GMT', dsp.build_url()
+		})
+	end
 
-		luci.http.redirect(dsp.build_url())
+	luci.http.redirect(dsp.build_url())
 end
