@@ -1,57 +1,15 @@
 -- Copyright 2008 Steven Barth <steven@midlink.org>
 -- Copyright 2008 Jo-Philipp Wich <jow@openwrt.org>
+-- Re-adapted for the OpenWISP Project http://openwisp.org
 -- Licensed to the public under the Apache License 2.0.
 
-module("luci.controller.openwisp.system", package.seeall)
+module("luci.controller.openwisp.actions", package.seeall)
 
 function index()
-	entry({"openwisp", "system"}, alias("openwisp", "system", "index"), _("System"), 40).index = true
-	entry({"openwisp", "system", "index"}, cbi("openwisp/system", {autoapply=true}), _("General"), 1)
---	entry({"openwisp", "system", "passwd"}, form("openwisp/passwd"), _("Admin Password"), 10)
---	entry({"openwisp", "system", "backup"}, call("action_backup"), _("Backup / Restore"), 80)
-	entry({"openwisp", "system", "upgrade"}, call("action_upgrade"), _("Flash Firmware"), 90)
-	entry({"openwisp", "system", "reboot"}, call("action_reboot"), _("Reboot"), 100)
-end
-
-function action_backup()
-	local reset_avail = os.execute([[grep '"rootfs_data"' /proc/mtd >/dev/null 2>&1]]) == 0
-	local restore_cmd = "gunzip | tar -xC/ >/dev/null 2>&1"
-	local backup_cmd  = "tar -c %s | gzip 2>/dev/null"
-
-	local restore_fpi
-	luci.http.setfilehandler(
-		function(meta, chunk, eof)
-			if not restore_fpi then
-				restore_fpi = io.popen(restore_cmd, "w")
-			end
-			if chunk then
-				restore_fpi:write(chunk)
-			end
-			if eof then
-				restore_fpi:close()
-			end
-		end
-	)
-
-	local upload = luci.http.formvalue("archive")
-	local backup = luci.http.formvalue("backup")
-	local reset  = reset_avail and luci.http.formvalue("reset")
-
-	if upload and #upload > 0 then
-		luci.template.render("openwisp/applyreboot")
-		luci.sys.reboot()
-	elseif backup then
-		local reader = ltn12_popen(backup_cmd:format(_keep_pattern()))
-		luci.http.header('Content-Disposition', 'attachment; filename="backup-%s-%s.tar.gz"' % {
-			luci.sys.hostname(), os.date("%Y-%m-%d")})
-		luci.http.prepare_content("application/x-targz")
-		luci.ltn12.pump.all(reader, luci.http.write)
-	elseif reset then
-		luci.template.render("openwisp/applyreboot")
-		luci.util.exec("mtd -r erase rootfs_data")
-	else
-		luci.template.render("openwisp/backup", {reset_avail = reset_avail})
-	end
+	entry({"openwisp", "actions"}, alias("openwisp", "actions", "index"), _("Actions"), 30).index = true
+	entry({"openwisp", "actions", "upgrade"}, call("action_upgrade"), _("Upgrade Firmware"), 31)
+	entry({"openwisp", "actions", "reboot"}, call("action_reboot"), _("Reboot"), 32)
+	entry({"openwisp", "logout"}, call("action_logout"), _("Logout"), 40)
 end
 
 function action_reboot()
@@ -69,12 +27,11 @@ function action_upgrade()
 
 	local function image_supported()
 		-- XXX: yay...
-		return ( 0 == os.execute(
+		return (0 == os.execute(
 			". /lib/functions.sh; " ..
 			"include /lib/upgrade; " ..
-			"platform_check_image %q >/dev/null"
-				% tmpfile
-		) )
+			"platform_check_image %q >/dev/null" % tmpfile
+		))
 	end
 
 	local function image_checksum()
@@ -103,7 +60,6 @@ function action_upgrade()
 		return size
 	end
 
-
 	-- Install upload handler
 	local file
 	luci.http.setfilehandler(
@@ -120,11 +76,10 @@ function action_upgrade()
 		end
 	)
 
-
 	-- Determine state
 	local keep_avail   = true
-	local step         = tonumber(luci.http.formvalue("step") or 1)
-	local has_image    = nixio.fs.access(tmpfile)
+	local step		 = tonumber(luci.http.formvalue("step") or 1)
+	local has_image	= nixio.fs.access(tmpfile)
 	local has_support  = image_supported()
 	local has_platform = nixio.fs.access("/lib/upgrade/platform.sh")
 	local has_upload   = luci.http.formvalue("image")
@@ -149,8 +104,6 @@ function action_upgrade()
 			-- Make sure the device is rebooted
 			luci.sys.reboot()
 		end
-
-
 	--
 	-- This is step 1-3, which does the user interaction and
 	-- image upload.
@@ -205,7 +158,6 @@ function _keep_pattern()
 end
 
 function ltn12_popen(command)
-
 	local fdi, fdo = nixio.pipe()
 	local pid = nixio.fork()
 
@@ -232,4 +184,20 @@ function ltn12_popen(command)
 		fdo:close()
 		nixio.exec("/bin/sh", "-c", command)
 	end
+end
+
+function action_logout()
+		local dsp = require "luci.dispatcher"
+		local utl = require "luci.util"
+		local sid = dsp.context.authsession
+
+		if sid then
+			utl.ubus("session", "destroy", { ubus_rpc_session = sid })
+
+			luci.http.header("Set-Cookie", "sysauth=%s; expires=%s; path=%s/" %{
+					sid, 'Thu, 01 Jan 1970 01:00:00 GMT', dsp.build_url()
+			})
+		end
+
+		luci.http.redirect(dsp.build_url())
 end
