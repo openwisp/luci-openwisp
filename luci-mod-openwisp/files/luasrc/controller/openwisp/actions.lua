@@ -8,16 +8,13 @@ module("luci.controller.openwisp.actions", package.seeall)
 function index()
 	entry({"openwisp", "actions"}, alias("openwisp", "actions", "index"), _("Actions"), 30).index = true
 	entry({"openwisp", "actions", "upgrade"}, call("action_upgrade"), _("Upgrade Firmware"), 31)
-	entry({"openwisp", "actions", "reboot"}, call("action_reboot"), _("Reboot"), 32)
+	entry({"openwisp", "actions", "reboot"}, template("openwisp/reboot"), _("Reboot"), 90)
+	entry({"openwisp", "actions", "reboot", "call"}, post("action_reboot"))
 	entry({"openwisp", "logout"}, call("action_logout"), _("Logout"), 40)
 end
 
 function action_reboot()
-	local reboot = luci.http.formvalue("reboot")
-	luci.template.render("openwisp/reboot", {reboot=reboot})
-	if reboot then
-		luci.sys.reboot()
-	end
+	luci.sys.reboot()
 end
 
 function action_upgrade()
