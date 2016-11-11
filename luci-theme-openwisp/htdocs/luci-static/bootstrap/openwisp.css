@@ -1,0 +1,25 @@
+body{ padding-top: 107px}
+header{ height: 90px }
+.brand img{
+    margin-bottom: -4px;
+    margin-top: -2px
+}
+
+header div > ul, .nav{
+    font-size: 15px;
+    margin-top: 24px;
+}
+
+header a{
+    margin: 0 3px;
+    font-weight: bold;
+}
+
+header li ul li a {
+    font-size: 13px;
+    padding: 7px 15px;
+}
+
+.menu-dropdown, .dropdown-menu{
+    margin-top: -4px;
+}
