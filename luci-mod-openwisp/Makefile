@@ -42,19 +42,19 @@ define Package/luci-mod-openwisp/install
 		$(1)/usr/lib/lua/luci/view/openwisp
 
 	$(INSTALL_CONF) \
-		files/luci_openwisp \
+		luci_openwisp.config \
 		$(1)/etc/config/luci_openwisp
 
-	$(CP) -r files/luasrc/controller/openwisp/* \
+	$(CP) -r luasrc/controller/openwisp/* \
 		$(1)/usr/lib/lua/luci/controller/openwisp/
 
-	$(CP) -r files/luasrc/model/cbi/openwisp/* \
+	$(CP) -r luasrc/model/cbi/openwisp/* \
 		$(1)/usr/lib/lua/luci/model/cbi/openwisp/
 
-	$(CP) -r files/luasrc/view/* \
+	$(CP) -r luasrc/view/* \
 			$(1)/usr/lib/lua/luci/view/
 
-	$(CP) -r files/luasrc/view/openwisp/* \
+	$(CP) -r luasrc/view/openwisp/* \
 		$(1)/usr/lib/lua/luci/view/openwisp/
 endef
 
