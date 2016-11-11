@@ -13,7 +13,7 @@
 	<fieldset class="cbi-section">
 		<!-- <legend><%:Flash new firmware image%></legend> -->
 		<% if upgrade_avail then %>
-			<form method="post" action="<%=url('admin/system/flashops/sysupgrade')%>" enctype="multipart/form-data">
+			<form method="post" action="<%=url('openwisp/actions/sysupgrade')%>" enctype="multipart/form-data">
 				<input type="hidden" name="token" value="<%=token%>" />
 				<div class="cbi-section-descr"><%:Upload a sysupgrade-compatible image here to replace the running firmware. Check "Keep settings" to retain the current configuration (requires an OpenWrt compatible firmware image).%></div>
 				<div class="cbi-section-node">

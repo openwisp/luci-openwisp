@@ -8,6 +8,7 @@ module("luci.controller.openwisp.actions", package.seeall)
 function index()
 	entry({"openwisp", "actions"}, alias("openwisp", "actions", "index"), _("Actions"), 30).index = true
 	entry({"openwisp", "actions", "upgrade"}, call("action_upgrade"), _("Upgrade Firmware"), 31)
+	entry({"openwisp", "actions", "sysupgrade"}, call("action_sysupgrade"))
 	entry({"openwisp", "actions", "reboot"}, template("openwisp/reboot"), _("Reboot"), 90)
 	entry({"openwisp", "actions", "reboot", "call"}, post("action_reboot"))
 	entry({"openwisp", "logout"}, call("action_logout"), _("Logout"), 40)
@@ -17,8 +18,42 @@ function action_reboot()
 	luci.sys.reboot()
 end
 
+local function image_supported(image)
+	return (os.execute("sysupgrade -T %q >/dev/null" % image) == 0)
+end
+
+local function image_checksum(image)
+	return (luci.sys.exec("md5sum %q" % image):match("^([^%s]+)"))
+end
+
+local function image_sha256_checksum(image)
+	return (luci.sys.exec("sha256sum %q" % image):match("^([^%s]+)"))
+end
+
 local function supports_sysupgrade()
 	return nixio.fs.access("/lib/upgrade/platform.sh")
+end
+
+local function storage_size()
+	local size = 0
+	if nixio.fs.access("/proc/mtd") then
+		for l in io.lines("/proc/mtd") do
+			local d, s, e, n = l:match('^([^%s]+)%s+([^%s]+)%s+([^%s]+)%s+"([^%s]+)"')
+			if n == "linux" or n == "firmware" then
+				size = tonumber(s, 16)
+				break
+			end
+		end
+	elseif nixio.fs.access("/proc/partitions") then
+		for l in io.lines("/proc/partitions") do
+			local x, y, b, n = l:match('^%s*(%d+)%s+(%d+)%s+([^%s]+)%s+([^%s]+)')
+			if b and n and not n:match('[0-9]') then
+				size = tonumber(b) * 1024
+				break
+			end
+		end
+	end
+	return size
 end
 
 function action_upgrade()
@@ -60,7 +95,7 @@ function action_sysupgrade()
 	--
 	if http.formvalue("cancel") then
 		fs.unlink(image_tmp)
-		http.redirect(luci.dispatcher.build_url('openwisp/upgrade'))
+		http.redirect(luci.dispatcher.build_url('openwisp/actions/upgrade'))
 		return
 	end
 
@@ -89,7 +124,7 @@ function action_sysupgrade()
 	--
 	elseif step == 2 then
 		local keep = (http.formvalue("keep") == "1") and "" or "-n"
-		luci.template.render("openwisp/reboot", {
+		luci.template.render("openwisp/upgrade/applyreboot", {
 			title = luci.i18n.translate("Flashing..."),
 			msg   = luci.i18n.translate("The system is flashing now.<br /> DO NOT POWER OFF THE DEVICE!<br /> Wait a few minutes before you try to reconnect. It might be necessary to renew the address of your computer to reach the device again, depending on your settings."),
 			addr  = (#keep > 0) and "192.168.1.1" or nil
