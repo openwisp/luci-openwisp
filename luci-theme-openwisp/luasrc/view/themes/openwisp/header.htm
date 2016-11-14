@@ -163,10 +163,10 @@
 		<title><%=striptags( (boardinfo.hostname or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '')) %> - LuCI</title>
 		<!--[if lt IE 9]><script src="<%=media%>/../bootstrap/html5.js"></script><![endif]-->
 		<meta name="viewport" content="initial-scale=1.0">
-		<link rel="shortcut icon" href="<%=media%>/favicon.ico">
 		<link rel="stylesheet" href="<%=media%>/../bootstrap/cascade.css">
         <link rel="stylesheet" href="<%=media%>/openwisp.css">
 		<link rel="stylesheet" media="only screen and (max-device-width: 854px)" href="<%=media%>/../bootstrap/mobile.css" type="text/css" />
+		<link rel="shortcut icon" href="<%=media%>/favicon.png">
 		<% if node and node.css then %>
 			<link rel="stylesheet" href="<%=resource%>/<%=node.css%>">
 		<% end -%>
