@@ -7,9 +7,40 @@
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=OpenWISP Theme (derived from Bootstrap theme)
-LUCI_DEPENDS:=+luci-theme-bootstrap
+PKG_NAME:=luci-theme-openwisp
+PKG_VERSION:=$(shell cat ../VERSION)
+PKG_RELEASE:=1
+PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)/$(PKG_SOURCE_SUBDIR)
+PKG_LICENSE:=GPL-3.0
 
-include ../../luci.mk
+include $(INCLUDE_DIR)/package.mk
 
-# call BuildPackage - OpenWrt buildroot signature
+define Package/luci-theme-openwisp
+	SECTION:=luci
+	CATEGORY:=LuCI
+	SUBMENU:=4. Themes
+	TITLE:=OpenWISP theme
+	DEPENDS:=+luci-theme-bootstrap
+	MAINTAINER:=Federico Capoano <f.capoano@cineca.it>
+endef
+
+define Package/luci-theme-openwisp/description
+	OpenWISP theme for LuCI, based on the bootstrap theme.
+endef
+
+define Build/Compile
+endef
+
+define Package/luci-theme-openwisp/install
+	$(INSTALL_DIR) \
+		$(1)/usr/lib/lua/luci/view/themes/openwisp \
+		$(1)/www/luci-static/bootstrap
+
+	$(CP) -r luasrc/view/themes/openwisp/* \
+		$(1)/usr/lib/lua/luci/view/themes/openwisp/
+
+	$(CP) -r htdocs/luci-static/bootstrap/* \
+		$(1)/www/luci-static/bootstrap/
+endef
+
+$(eval $(call BuildPackage,luci-theme-openwisp))
