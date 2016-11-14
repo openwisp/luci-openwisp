@@ -164,6 +164,7 @@
 		<!--[if lt IE 9]><script src="<%=media%>/html5.js"></script><![endif]-->
 		<meta name="viewport" content="initial-scale=1.0">
 		<link rel="stylesheet" href="<%=media%>/cascade.css">
+		<link rel="stylesheet" href="<%=media%>/openwisp.css">
 		<link rel="stylesheet" media="only screen and (max-device-width: 854px)" href="<%=media%>/mobile.css" type="text/css" />
 		<link rel="shortcut icon" href="<%=media%>/favicon.ico">
 		<% if node and node.css then %>
@@ -179,7 +180,7 @@
 		<header>
 			<div class="fill">
 				<div class="container">
-					<a class="brand" href="#">
+					<a class="brand" href="<%=luci.dispatcher.build_url('openwisp/index')%>">
 						<img src="<%=media%>/openwisp-logo.png" alt="" width="125">
 					</a>
 					<% render_topmenu() %>
