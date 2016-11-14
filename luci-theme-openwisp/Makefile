@@ -34,13 +34,13 @@ endef
 define Package/luci-theme-openwisp/install
 	$(INSTALL_DIR) \
 		$(1)/usr/lib/lua/luci/view/themes/openwisp \
-		$(1)/www/luci-static/bootstrap
+		$(1)/www/luci-static/openwisp
 
 	$(CP) -r luasrc/view/themes/openwisp/* \
 		$(1)/usr/lib/lua/luci/view/themes/openwisp/
 
-	$(CP) -r htdocs/luci-static/bootstrap/* \
-		$(1)/www/luci-static/bootstrap/
+	$(CP) -r htdocs/luci-static/openwisp/* \
+		$(1)/www/luci-static/openwisp/
 endef
 
 $(eval $(call BuildPackage,luci-theme-openwisp))
