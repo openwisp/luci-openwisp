@@ -8,8 +8,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-mod-openwisp
+PKG_VERSION:=$(shell cat ../VERSION)
 PKG_RELEASE:=1
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)/$(PKG_SOURCE_SUBDIR)
+PKG_LICENSE:=GPL-3.0
 
 include $(INCLUDE_DIR)/package.mk
 
