@@ -40,7 +40,6 @@ define Package/luci-mod-openwisp/install
 		$(1)/etc/config \
 		$(1)/usr/lib/lua/luci/controller/openwisp \
 		$(1)/usr/lib/lua/luci/model/cbi/openwisp \
-		$(1)/usr/lib/lua/luci/view \
 		$(1)/usr/lib/lua/luci/view/openwisp
 
 	$(INSTALL_CONF) \
@@ -52,9 +51,6 @@ define Package/luci-mod-openwisp/install
 
 	$(CP) -r luasrc/model/cbi/openwisp/* \
 		$(1)/usr/lib/lua/luci/model/cbi/openwisp/
-
-	$(CP) -r luasrc/view/* \
-			$(1)/usr/lib/lua/luci/view/
 
 	$(CP) -r luasrc/view/openwisp/* \
 		$(1)/usr/lib/lua/luci/view/openwisp/
