@@ -33,5 +33,5 @@ function index()
 	page.ucidata = true
 	page.index = true
 
-	entry({"openwisp", "index"}, form("openwisp/index"), _("Home"), 1).index = true
+	entry({"openwisp", "index"}, template("openwisp/status/index"), _("Status"), 1).index = true
 end
