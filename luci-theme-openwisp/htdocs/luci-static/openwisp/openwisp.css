@@ -3,6 +3,7 @@
     header .brand{ display: none }
     header div > ul, .nav{ font-size: 14px }
     header .pull-right { padding: 0; margin: 9px 7px }
+    footer{ text-align: center }
 }
 
 /* desktop */
@@ -15,4 +16,5 @@
     header li ul li a { font-size: 13px; padding: 7px 15px }
     .menu-dropdown, .dropdown-menu{ margin-top: -4px }
     header .pull-right { padding: 0; margin-top: 20px }
+    footer{ text-align: right }
 }
