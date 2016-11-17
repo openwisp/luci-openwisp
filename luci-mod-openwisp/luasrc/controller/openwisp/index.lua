@@ -1,3 +1,5 @@
+-- OpenWISP Project (GPLv3) http://openwisp.org
+
 module("luci.controller.openwisp.index", package.seeall)
 require("uci")
 require("nixio")

@@ -1,3 +1,5 @@
+-- OpenWISP Project (GPLv3) http://openwisp.org
+
 module("luci.controller.openwisp.settings", package.seeall)
 require("uci")
 
