@@ -40,7 +40,8 @@ define Package/luci-mod-openwisp/install
 		$(1)/etc/config \
 		$(1)/usr/lib/lua/luci/controller/openwisp \
 		$(1)/usr/lib/lua/luci/model/cbi/openwisp \
-		$(1)/usr/lib/lua/luci/view/openwisp
+		$(1)/usr/lib/lua/luci/view/openwisp \
+		$(1)/usr/sbin
 
 	$(INSTALL_CONF) \
 		luci_openwisp.config \
@@ -54,6 +55,10 @@ define Package/luci-mod-openwisp/install
 
 	$(CP) -r luasrc/view/openwisp/* \
 		$(1)/usr/lib/lua/luci/view/openwisp/
+
+	$(INSTALL_BIN) \
+		sbin/openwisp-passwd.lua \
+		$(1)/usr/sbin/openwisp-passwd
 endef
 
 $(eval $(call BuildPackage,luci-mod-openwisp))
