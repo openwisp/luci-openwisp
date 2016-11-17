@@ -25,7 +25,7 @@ endef
 define Package/luci-openwisp
 	$(call Package/luci-openwisp/common)
 	TITLE:=LuCI OpenWISP collection
-	DEPENDS:=+uhttpd +uhttpd-mod-ubus +libiwinfo-lua \
+	DEPENDS:=+uhttpd +uhttpd-mod-ubus \
 	         +luci-mod-openwisp +luci-theme-openwisp
 endef
 
