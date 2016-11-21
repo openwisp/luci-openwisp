@@ -10,8 +10,7 @@ LuCI OpenWISP
 
 LuCI (OpenWRT Web Interface) customizations for the OpenWISP project.
 
-.. image:: http://netjsonconfig.openwisp.org/en/latest/_images/openwisp.org.svg
-  :target: http://openwisp.org
+.. image:: https://raw.githubusercontent.com/openwisp/luci-openwisp/master/status-page-screenshot.png
 
 .. contents:: **Table of Contents**:
  :backlinks: none
