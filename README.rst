@@ -22,19 +22,19 @@ LuCI (OpenWRT Web Interface) customizations for the OpenWISP project.
 Features
 --------
 
-* login with a different username and password combination than the root SSH password
-* possibility to edit LAN settings
-* status page (inherited from ``luci-admin-full``)
-* upgrade firmware page
-* reboot
-* logout
-* meta-packages for easier installation:
-    * ``luci-openwisp``
-    * ``luci-openwisp-polarssl`` with HTTPs support
-    * ``luci-openwisp-openssl`` with HTTPs support
+- login with a different username and password combination than the root SSH password
+- possibility to edit LAN settings
+- status page (inherited from ``luci-admin-full``)
+- upgrade firmware page
+- reboot
+- logout
+- meta-packages for easier installation:
+    - ``luci-openwisp``
+    - ``luci-openwisp-polarssl`` with HTTPs support
+    - ``luci-openwisp-openssl`` with HTTPs support
 
-Install precompiled package
----------------------------
+Install precompiled packages
+----------------------------
 
 First run:
 
@@ -78,47 +78,48 @@ To change the default password for the web UI, use the ``openwisp-passwd`` scrip
     secret
     luci-mod-openwisp password for user operator changed successfully
 
+Packages
+--------
+
+This repository contains 2 packages:
+
+1. ``luci-mod-openwisp``: contains the custom password validator and limited menu interface
+2. ``luci-theme-openwisp``: contains a few adjustments to the general luci theme
+
+Additionally a few meta-packages are also present in the ``luci-openwisp`` directory. These meta-packages
+can be used in alternative to the commonly used ``luci`` or ``luci-ssl``.
+
+- ``luci-openwisp``: depends on ``uhttpd``, ``uhttpd-mod-ubus``, ``luci-mod-openwisp`` and ``luci-theme-openwisp``
+- ``luci-openwisp-polarssl``: depends ``luci-openwisp``, ``libustream-polarssl`` and ``px5g``
+- ``luci-openwisp-openssl``: depends ``luci-openwisp``, ``libustream-openssl`` and ``px5g``
+
 Compiling luci-openwisp
 -----------------------
 
-There are 3 variants of *luci-openwisp*:
-
-- **luci-openwisp**:
-- **luci-openwisp-openssl**: adds support for HTTPs and depends *libopenssl*
-- **luci-openwisp-polarssl**: adds support for HTTPs and depends on *libpolarssl*
-
-The following procedure illustrates how to compile the different packages in this repository:
+The following procedure illustrates how to compile the meta-package ``luci-openwisp``:
 
 .. code-block:: shell
 
-    git clone git://git.openwrt.org/openwrt.git --depth 1
+    git clone https://github.com/openwrt/openwrt.git --depth 1
     cd openwrt
 
     # configure feeds
     cp feeds.conf.default feeds.conf
-    echo "src-git openwisp https://github.com/openwisp/luci-openwisp.git" >> feeds.conf
+    echo "src-git luciopenwisp https://github.com/openwisp/luci-openwisp.git" >> feeds.conf
     ./scripts/feeds update -a
     ./scripts/feeds install -a
     # replace with your desired arch target
     arch="ar71xx"
     echo "CONFIG_TARGET_$arch=y" > .config;
-    echo "CONFIG_PACKAGE_luci-openwisp-polarssl=y" >> .config
+    echo "CONFIG_PACKAGE_luci-openwisp=y" >> .config
     make defconfig
     make tools/install
     make toolchain/install
-    make package/luci-mod-openwisp/compile
-    make package/luci-mod-openwisp/install
-    make package/luci-theme-openwisp/compile
-    make package/luci-theme-openwisp/install
     make package/luci-openwisp/compile
     make package/luci-openwisp/install
-    make package/luci-openwisp-polarssl/compile
-    make package/luci-openwisp-polarssl/install
-    make package/luci-openwisp-openssl/compile
-    make package/luci-openwisp-openssl/install
 
 Alternatively, you can configure your build interactively with ``make menuconfig``, in this case
-you will need to select the *luci-openwisp* variant by going to ``Luci > 1. Collections``:
+you will need to select one of the available *luci-openwisp* variants by going to ``Luci > 1. Collections``:
 
 .. code-block:: shell
 
@@ -127,7 +128,7 @@ you will need to select the *luci-openwisp* variant by going to ``Luci > 1. Coll
 
     # configure feeds
     cp feeds.conf.default feeds.conf
-    echo "src-git openwispluci https://github.com/openwisp/luci-openwisp.git" >> feeds.conf
+    echo "src-git luciopenwisp https://github.com/openwisp/luci-openwisp.git" >> feeds.conf
     ./scripts/feeds update -a
     ./scripts/feeds install -a
     make menuconfig
