@@ -1,7 +1,7 @@
 Change log
 ^^^^^^^^^^
 
-0.1 [unreleased]
+0.1 [2016-11-21]
 ================
 
 * added custom password validator that allows to log in without supplying root user credentials
