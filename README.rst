@@ -3,8 +3,10 @@ LuCI OpenWISP
 =============
 
 .. image:: https://ci.publicwifi.it/buildStatus/icon?job=luci-openwisp
+   :target: #
 
 .. image:: http://img.shields.io/github/release/openwisp/luci-openwisp.svg
+   :target: https://github.com/openwisp/luci-openwisp/releases
 
 ------------
 
