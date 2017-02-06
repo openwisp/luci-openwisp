@@ -20,6 +20,16 @@ LuCI (OpenWRT Web Interface) customizations for the OpenWISP project.
 
 ------------
 
+Goal
+----
+
+The goal of this project is to provide a limited web interface for OpenWRT so that users can
+configure only the bare minimum in order for their device to connect to the `OpenWISP 2 Controller
+<https://github.com/openwisp/ansible-openwisp2>`_.
+
+Use this web interface only if you have a similar use case, otherwise you should keep the
+default OpenWRT interface (*luci-mod-admin-full*).
+
 Features
 --------
 
