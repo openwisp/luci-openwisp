@@ -1,6 +1,7 @@
 -- OpenWISP Project (GPLv3) http://openwisp.org
 
 module("luci.controller.openwisp.index", package.seeall)
+require("luci.util")
 require("uci")
 require("nixio")
 
@@ -20,11 +21,11 @@ function index()
 		local cursor = uci.cursor()
 		local configured_username = cursor:get("luci_openwisp", "gui", "username") or ''
 		local configured_password = cursor:get("luci_openwisp", "gui", "password") or ''
-		local configured_salt = cursor:get("luci_openwisp", "gui", "salt") or ''
+		local salt = luci.util.split(configured_password, '$')[3] or ''
 		local crypted = ''
 
 		if user and pass then
-			crypted = nixio.crypt(pass, "$1$"..configured_salt)
+			crypted = nixio.crypt(pass, "$1$"..salt)
 		end
 
 		if user == configured_username and crypted == configured_password then

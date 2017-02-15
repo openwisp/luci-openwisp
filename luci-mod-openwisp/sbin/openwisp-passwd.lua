@@ -53,7 +53,6 @@ end
 
 salt = string.random(8)
 crypted_password = nixio.crypt(password, '$1$'..salt)
-config.set('luci_openwisp', 'gui', 'salt', salt)
 config.set('luci_openwisp', 'gui', 'password', crypted_password)
 config.commit('luci_openwisp')
 print('luci-mod-openwisp password for user '..username..' changed successfully')

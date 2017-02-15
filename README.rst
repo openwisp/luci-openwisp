@@ -74,7 +74,6 @@ UCI configuration options must go in ``/etc/config/luci_openwisp``.
 
 - ``username``: username for the web interface, defaults to ``operator``
 - ``password``: encrypted password for the web interface, defaults ``password`` (encrypted)
-- ``salt``: salt used during encryption, defaults to ``openwisp``
 
 Change web UI password
 ----------------------
