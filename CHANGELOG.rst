@@ -1,10 +1,13 @@
 Change log
 ^^^^^^^^^^
 
-0.1.1 [unreleased]
+0.1.1 [2017-02-15]
 ==================
 
-WIP
+- `#2 <https://github.com/openwisp/openwisp-config/issues/2>`_:
+  [auth] Removed the need of redundant salt
+- `6c87e7a <https://github.com/openwisp/openwisp-config/commit/6c87e7a>`_:
+  [Makefile] Added more SSL variants
 
 0.1.0 [2016-11-21]
 ==================
