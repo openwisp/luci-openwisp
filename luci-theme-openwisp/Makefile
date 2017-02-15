@@ -22,6 +22,7 @@ define Package/luci-theme-openwisp
 	TITLE:=OpenWISP theme
 	DEPENDS:=+luci-theme-bootstrap
 	MAINTAINER:=Federico Capoano <f.capoano@cineca.it>
+	URL:=http://openwisp.org
 endef
 
 define Package/luci-theme-openwisp/description

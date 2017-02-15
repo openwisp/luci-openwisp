@@ -20,6 +20,7 @@ define Package/luci-mod-openwisp
 	TITLE:=LuCI OpenWISP module
 	DEPENDS:=+luci-base
 	MAINTAINER:=Riccardo Bloise <r.bloise@cineca.it>
+	URL:=http://openwisp.org
 endef
 
 define Package/luci-mod-openwisp/description
