@@ -1,8 +1,13 @@
 Change log
 ^^^^^^^^^^
 
-0.1 [2016-11-21]
-================
+0.1.1 [unreleased]
+==================
+
+WIP
+
+0.1.0 [2016-11-21]
+==================
 
 * added custom password validator that allows to log in without supplying root user credentials
 * added network settings page
