@@ -21,6 +21,7 @@ define Package/luci-theme-openwisp
 	SUBMENU:=4. Themes
 	TITLE:=OpenWISP theme
 	DEPENDS:=+luci-theme-bootstrap
+	PKGARCH:=all
 	MAINTAINER:=Federico Capoano <f.capoano@cineca.it>
 	URL:=http://openwisp.org
 endef

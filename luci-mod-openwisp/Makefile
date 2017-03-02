@@ -19,6 +19,7 @@ define Package/luci-mod-openwisp
 	SUBMENU:=2. Modules
 	TITLE:=LuCI OpenWISP module
 	DEPENDS:=+luci-base +libiwinfo-lua
+	PKGARCH:=all
 	MAINTAINER:=Riccardo Bloise <r.bloise@cineca.it>
 	URL:=http://openwisp.org
 endef

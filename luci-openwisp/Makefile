@@ -17,6 +17,7 @@ define Package/luci-openwisp/common
 	SECTION:=luci
 	CATEGORY:=LuCI
 	SUBMENU:=1. Collections
+	PKGARCH:=all
 	MAINTAINER:=Federico Capoano <f.capoano@cineca.it>
 	URL:=http://openwisp.org
 endef
