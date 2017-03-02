@@ -9,9 +9,9 @@ WIP
 0.1.1 [2017-02-15]
 ==================
 
-- `#2 <https://github.com/openwisp/openwisp-config/issues/2>`_:
+- `#2 <https://github.com/openwisp/luci-openwisp/issues/2>`_:
   [auth] Removed the need of redundant salt
-- `6c87e7a <https://github.com/openwisp/openwisp-config/commit/6c87e7a>`_:
+- `6c87e7a <https://github.com/openwisp/luci-openwisp/commit/6c87e7a>`_:
   [Makefile] Added more SSL variants
 
 0.1.0 [2016-11-21]
