@@ -64,8 +64,7 @@ Where ``<URL>`` is the URL of the image that is suitable for your case.
 For a list of the latest built images, take a look at `downloads.openwisp.org
 <http://downloads.openwisp.org/luci-openwisp/>`_.
 
-If the SoC or OpenWRT (or LEDE) version you are using is not available, you have to compile the package,
-(see `Compiling luci-openwisp`_).
+If you need to compile the package yourself see `Compiling luci-openwisp`_.
 
 Configuration options
 ---------------------
@@ -118,7 +117,7 @@ The following procedure illustrates how to compile the meta-package ``luci-openw
     echo "src-git luciopenwisp https://github.com/openwisp/luci-openwisp.git" >> feeds.conf
     ./scripts/feeds update -a
     ./scripts/feeds install -a
-    # replace with your desired arch target
+    # any arch/target is fine because the packages are architecture indipendent
     arch="ar71xx"
     echo "CONFIG_TARGET_$arch=y" > .config;
     echo "CONFIG_PACKAGE_luci-openwisp=y" >> .config
