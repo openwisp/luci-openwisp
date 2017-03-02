@@ -10,7 +10,7 @@ LuCI OpenWISP
 
 ------------
 
-LuCI (OpenWRT Web Interface) customizations for the OpenWISP project.
+`LuCI <https://github.com/openwrt/luci>`_ extensions for the OpenWISP project.
 
 .. image:: https://raw.githubusercontent.com/openwisp/luci-openwisp/master/status-page-screenshot.png
 
@@ -23,12 +23,13 @@ LuCI (OpenWRT Web Interface) customizations for the OpenWISP project.
 Goal
 ----
 
-The goal of this project is to provide a limited web interface for OpenWRT so that users can
-configure only the bare minimum in order for their device to connect to the `OpenWISP 2 Controller
-<https://github.com/openwisp/ansible-openwisp2>`_.
+The goal of this project is to provide a limited web interface for
+`LEDE <https://lede-project.org/>`_ / `OpenWRT <https://openwrt.org/>`_ so
+that users can configure only the bare minimum in order for their device to connect
+to the `OpenWISP 2 Controller <https://github.com/openwisp/ansible-openwisp2>`_.
 
 Use this web interface only if you have a similar use case, otherwise you should keep the
-default OpenWRT interface (*luci-mod-admin-full*).
+default LEDE / OpenWRT interface (*luci-mod-admin-full*).
 
 Features
 --------
@@ -109,8 +110,8 @@ The following procedure illustrates how to compile the meta-package ``luci-openw
 
 .. code-block:: shell
 
-    git clone https://github.com/openwrt/openwrt.git --depth 1
-    cd openwrt
+    git clone git://git.lede-project.org/source.git lede
+    cd lede
 
     # configure feeds
     cp feeds.conf.default feeds.conf
@@ -132,8 +133,8 @@ you will need to select one of the available *luci-openwisp* variants by going t
 
 .. code-block:: shell
 
-    git clone git://git.openwrt.org/openwrt.git --depth 1
-    cd openwrt
+    git clone git://git.lede-project.org/source.git lede
+    cd lede
 
     # configure feeds
     cp feeds.conf.default feeds.conf
@@ -142,6 +143,7 @@ you will need to select one of the available *luci-openwisp* variants by going t
     ./scripts/feeds install -a
     make menuconfig
     # go to Luci > 1. Collections and select one of the variants
+    make -j1 V=s
 
 Changelog
 ---------
