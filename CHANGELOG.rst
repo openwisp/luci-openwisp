@@ -1,10 +1,13 @@
 Change log
 ^^^^^^^^^^
 
-0.1.2 [unreleased]
+0.1.2 [2017-03-02]
 ==================
 
-WIP
+- `17a21a4 <https://github.com/openwisp/luci-openwisp/commit/17a21a4>`_:
+  [makefile] added ``PKGARCH:=all`` in order to compile an architecture indipendent package
+- `fd00c43 <https://github.com/openwisp/luci-openwisp/commit/fd00c43>`_:
+  [docs] default compile instructions to to `LEDE <https://lede-project.org/>`_ 17.01
 
 0.1.1 [2017-02-15]
 ==================
