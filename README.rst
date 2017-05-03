@@ -42,8 +42,10 @@ Features
 - logout
 - meta-packages for easier installation:
     - ``luci-openwisp``
-    - ``luci-openwisp-polarssl`` with HTTPs support
-    - ``luci-openwisp-openssl`` with HTTPs support
+    - ``luci-openwisp-mbedtls``
+    - ``luci-openwisp-openssl``
+    - ``luci-openwisp-polarssl``
+    - ``luci-openwisp-cyassl``
 
 Install precompiled packages
 ----------------------------
@@ -100,8 +102,10 @@ Additionally a few meta-packages are also present in the ``luci-openwisp`` direc
 can be used in alternative to the commonly used ``luci`` or ``luci-ssl``.
 
 - ``luci-openwisp``: depends on ``uhttpd``, ``uhttpd-mod-ubus``, ``luci-mod-openwisp`` and ``luci-theme-openwisp``
-- ``luci-openwisp-polarssl``: depends ``luci-openwisp``, ``libustream-polarssl`` and ``px5g``
+- ``luci-openwisp-mbedtls``: depends ``luci-openwisp``, ``libustream-mbedtls`` and ``px5g``
 - ``luci-openwisp-openssl``: depends ``luci-openwisp``, ``libustream-openssl`` and ``px5g``
+- ``luci-openwisp-cyassl``: depends ``luci-openwisp``, ``libustream-cyassl`` and ``px5g``
+- ``luci-openwisp-polarssl``: depends ``luci-openwisp``, ``libustream-polarssl`` and ``px5g``
 
 Compiling luci-openwisp
 -----------------------
